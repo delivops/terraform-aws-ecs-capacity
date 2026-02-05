@@ -36,34 +36,3 @@ resource "aws_ecs_capacity_provider" "this" {
     aws_autoscaling_group.ecs,
   ]
 }
-
-# ==============================================================================
-# ATTACH CAPACITY PROVIDER TO CLUSTER
-# ==============================================================================
-
-# Attach the capacity provider to the existing cluster
-# WARNING: aws_ecs_cluster_capacity_providers replaces ALL capacity providers on the cluster.
-# Use existing_capacity_providers variable to preserve FARGATE/FARGATE_SPOT or other providers.
-resource "aws_ecs_cluster_capacity_providers" "this" {
-  cluster_name = var.cluster_name
-
-  capacity_providers = distinct(concat(
-    var.preserve_existing_capacity_providers ? var.existing_capacity_providers : [],
-    [aws_ecs_capacity_provider.this.name],
-  ))
-
-  # Only set default strategy if explicitly requested
-  dynamic "default_capacity_provider_strategy" {
-    for_each = var.set_default_strategy ? [1] : []
-
-    content {
-      capacity_provider = aws_ecs_capacity_provider.this.name
-      base              = 1
-      weight            = 100
-    }
-  }
-
-  depends_on = [
-    aws_ecs_capacity_provider.this,
-  ]
-}

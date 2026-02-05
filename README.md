@@ -16,7 +16,7 @@ This Terraform module provisions EC2 Auto Scaling capacity for Amazon ECS cluste
 - SSM Session Manager integration for SSH-less access
 - Configurable EBS volumes (gp3, encryption, custom IOPS)
 - Instance refresh for rolling updates
-- Preserves existing capacity providers (FARGATE/FARGATE_SPOT) by default
+- Capacity provider attachment managed externally for safe multi-provider setups
 
 ## Resources Created
 
@@ -25,6 +25,8 @@ This Terraform module provisions EC2 Auto Scaling capacity for Amazon ECS cluste
 - Launch Template with ECS-optimized AMI
 - IAM Role and Instance Profile
 - Security Group (optional)
+
+**Note:** This module does NOT attach the capacity provider to the cluster. You must create an `aws_ecs_cluster_capacity_providers` resource externally to safely combine multiple capacity providers.
 
 ## Usage
 
@@ -145,16 +147,52 @@ module "my_service" {
 }
 ```
 
-## Capacity Provider Behavior
+## Attaching Capacity Providers to Cluster
 
-The `aws_ecs_cluster_capacity_providers` resource **replaces** all capacity providers on the cluster, not adds to them. By default, this module preserves `FARGATE` and `FARGATE_SPOT` providers. Use `existing_capacity_providers` to specify other providers to preserve, or set `preserve_existing_capacity_providers = false` if you only want EC2 capacity.
+This module creates the capacity provider but does **not** attach it to the ECS cluster. This design allows you to safely combine multiple capacity providers (e.g., Spot + On-Demand, or multiple EC2 pools) without conflicts.
+
+Attach capacity providers using a single `aws_ecs_cluster_capacity_providers` resource:
+
+```python
+# Create multiple capacity providers
+module "ecs_capacity_spot" {
+  source       = "delivops/ecs-capacity/aws"
+  cluster_name = aws_ecs_cluster.main.name
+  use_spot     = true
+  # ...
+}
+
+module "ecs_capacity_ondemand" {
+  source       = "delivops/ecs-capacity/aws"
+  cluster_name = aws_ecs_cluster.main.name
+  # ...
+}
+
+# Attach all capacity providers in one place
+resource "aws_ecs_cluster_capacity_providers" "this" {
+  cluster_name = aws_ecs_cluster.main.name
+
+  capacity_providers = [
+    "FARGATE",
+    "FARGATE_SPOT",
+    module.ecs_capacity_spot.capacity_provider_name,
+    module.ecs_capacity_ondemand.capacity_provider_name,
+  ]
+
+  # Optional: Set default strategy
+  default_capacity_provider_strategy {
+    capacity_provider = module.ecs_capacity_spot.capacity_provider_name
+    base              = 1
+    weight            = 100
+  }
+}
+```
 
 ## Notes
 
 - Default AMI type is AL2023 ECS-optimized
 - Managed termination protection requires `protect_from_scale_in = true`
 - GPU instances auto-configure NVIDIA runtime via user data
-- Existing capacity providers (FARGATE/FARGATE_SPOT) are preserved by default
 - Use `capacity_provider_strategy` in ECS service to target EC2 capacity
 
 ## License

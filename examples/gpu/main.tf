@@ -47,6 +47,21 @@ module "ecs_capacity_gpu" {
   }
 }
 
+# ==============================================================================
+# ATTACH CAPACITY PROVIDERS TO CLUSTER
+# ==============================================================================
+# GPU capacity is attached alongside Fargate for flexibility.
+
+resource "aws_ecs_cluster_capacity_providers" "this" {
+  cluster_name = aws_ecs_cluster.main.name
+
+  capacity_providers = [
+    "FARGATE",
+    "FARGATE_SPOT",
+    module.ecs_capacity_gpu.capacity_provider_name,
+  ]
+}
+
 # Example: ML inference service using GPU capacity
 # module "ml_inference" {
 #   source = "git::https://github.com/delivops/terraform-aws-ecs-service.git"
