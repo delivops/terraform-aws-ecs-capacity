@@ -254,24 +254,6 @@ variable "managed_draining" {
   default     = true
 }
 
-variable "set_default_strategy" {
-  description = "Set this capacity provider as the cluster's default strategy"
-  type        = bool
-  default     = false
-}
-
-variable "existing_capacity_providers" {
-  description = "List of existing capacity providers to preserve when attaching to cluster (e.g., FARGATE, FARGATE_SPOT). aws_ecs_cluster_capacity_providers replaces all providers, so existing ones must be listed here."
-  type        = list(string)
-  default     = ["FARGATE", "FARGATE_SPOT"]
-}
-
-variable "preserve_existing_capacity_providers" {
-  description = "Whether to preserve existing capacity providers listed in existing_capacity_providers"
-  type        = bool
-  default     = true
-}
-
 # ==============================================================================
 # ECS AGENT CONFIGURATION
 # ==============================================================================

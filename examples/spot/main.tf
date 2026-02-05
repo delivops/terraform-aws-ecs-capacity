@@ -89,6 +89,31 @@ module "ecs_capacity_ondemand" {
 }
 
 # ==============================================================================
+# ATTACH CAPACITY PROVIDERS TO CLUSTER
+# ==============================================================================
+# This is managed outside the module so you can safely combine multiple
+# capacity providers without conflicts. Each module instance only creates
+# the capacity provider - attachment is done once here.
+
+resource "aws_ecs_cluster_capacity_providers" "this" {
+  cluster_name = aws_ecs_cluster.main.name
+
+  capacity_providers = [
+    "FARGATE",
+    "FARGATE_SPOT",
+    module.ecs_capacity_spot.capacity_provider_name,
+    module.ecs_capacity_ondemand.capacity_provider_name,
+  ]
+
+  # Optional: Set default strategy for services that don't specify one
+  default_capacity_provider_strategy {
+    capacity_provider = module.ecs_capacity_spot.capacity_provider_name
+    base              = 1
+    weight            = 100
+  }
+}
+
+# ==============================================================================
 # USAGE WITH SERVICES
 # ==============================================================================
 #

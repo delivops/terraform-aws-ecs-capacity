@@ -37,6 +37,22 @@ module "ecs_capacity" {
   }
 }
 
+# ==============================================================================
+# ATTACH CAPACITY PROVIDERS TO CLUSTER
+# ==============================================================================
+# This is managed outside the module so you can safely combine multiple
+# capacity providers (e.g., Spot + On-Demand, or multiple EC2 pools).
+
+resource "aws_ecs_cluster_capacity_providers" "this" {
+  cluster_name = aws_ecs_cluster.main.name
+
+  capacity_providers = [
+    "FARGATE",
+    "FARGATE_SPOT",
+    module.ecs_capacity.capacity_provider_name,
+  ]
+}
+
 # Use with the ECS service module
 # module "my_service" {
 #   source = "git::https://github.com/delivops/terraform-aws-ecs-service.git"

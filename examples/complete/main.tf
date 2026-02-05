@@ -108,6 +108,20 @@ module "ecs_capacity" {
 }
 
 # ==============================================================================
+# ATTACH CAPACITY PROVIDERS TO CLUSTER
+# ==============================================================================
+
+resource "aws_ecs_cluster_capacity_providers" "this" {
+  cluster_name = aws_ecs_cluster.main.name
+
+  capacity_providers = [
+    "FARGATE",
+    "FARGATE_SPOT",
+    module.ecs_capacity.capacity_provider_name,
+  ]
+}
+
+# ==============================================================================
 # APPLICATION LOAD BALANCER
 # ==============================================================================
 
