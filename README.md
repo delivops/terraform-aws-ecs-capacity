@@ -225,7 +225,6 @@ No modules.
 |------|------|
 | [aws_autoscaling_group.ecs](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/autoscaling_group) | resource |
 | [aws_ecs_capacity_provider.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_capacity_provider) | resource |
-| [aws_ecs_cluster_capacity_providers.this](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/ecs_cluster_capacity_providers) | resource |
 | [aws_iam_instance_profile.ecs_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_instance_profile) | resource |
 | [aws_iam_role.ecs_instance](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role) | resource |
 | [aws_iam_role_policy_attachment.additional](https://registry.terraform.io/providers/hashicorp/aws/latest/docs/resources/iam_role_policy_attachment) | resource |
@@ -260,7 +259,6 @@ No modules.
 | <a name="input_ecs_reserved_memory"></a> [ecs\_reserved\_memory](#input\_ecs\_reserved\_memory) | Memory reserved for ECS agent and system processes (MiB) | `number` | `256` | no |
 | <a name="input_enable_imdsv2"></a> [enable\_imdsv2](#input\_enable\_imdsv2) | Require IMDSv2 for instance metadata (recommended) | `bool` | `true` | no |
 | <a name="input_enable_ssm"></a> [enable\_ssm](#input\_enable\_ssm) | Attach SSM policy for Session Manager access | `bool` | `true` | no |
-| <a name="input_existing_capacity_providers"></a> [existing\_capacity\_providers](#input\_existing\_capacity\_providers) | List of existing capacity providers to preserve when attaching to cluster (e.g., FARGATE, FARGATE\_SPOT). aws\_ecs\_cluster\_capacity\_providers replaces all providers, so existing ones must be listed here. | `list(string)` | <pre>[<br/>  "FARGATE",<br/>  "FARGATE_SPOT"<br/>]</pre> | no |
 | <a name="input_gpu_enabled"></a> [gpu\_enabled](#input\_gpu\_enabled) | Enable GPU support (uses GPU AMI and configures NVIDIA runtime) | `bool` | `false` | no |
 | <a name="input_health_check_grace_period"></a> [health\_check\_grace\_period](#input\_health\_check\_grace\_period) | Seconds before health checks start after instance launch | `number` | `300` | no |
 | <a name="input_health_check_type"></a> [health\_check\_type](#input\_health\_check\_type) | Health check type: EC2 or ELB (use ELB when instances are behind a load balancer) | `string` | `"EC2"` | no |
@@ -281,7 +279,6 @@ No modules.
 | <a name="input_minimum_scaling_step_size"></a> [minimum\_scaling\_step\_size](#input\_minimum\_scaling\_step\_size) | Minimum number of instances to scale at once | `number` | `1` | no |
 | <a name="input_on_demand_base_capacity"></a> [on\_demand\_base\_capacity](#input\_on\_demand\_base\_capacity) | Minimum number of On-Demand instances before using Spot | `number` | `0` | no |
 | <a name="input_on_demand_percentage"></a> [on\_demand\_percentage](#input\_on\_demand\_percentage) | Percentage of On-Demand instances above base capacity (0-100) | `number` | `0` | no |
-| <a name="input_preserve_existing_capacity_providers"></a> [preserve\_existing\_capacity\_providers](#input\_preserve\_existing\_capacity\_providers) | Whether to preserve existing capacity providers listed in existing\_capacity\_providers | `bool` | `true` | no |
 | <a name="input_protect_from_scale_in"></a> [protect\_from\_scale\_in](#input\_protect\_from\_scale\_in) | Enable scale-in protection for managed termination | `bool` | `true` | no |
 | <a name="input_root_volume_encrypted"></a> [root\_volume\_encrypted](#input\_root\_volume\_encrypted) | Enable EBS encryption | `bool` | `true` | no |
 | <a name="input_root_volume_iops"></a> [root\_volume\_iops](#input\_root\_volume\_iops) | IOPS for gp3/io1/io2 volumes | `number` | `3000` | no |
@@ -291,7 +288,6 @@ No modules.
 | <a name="input_root_volume_type"></a> [root\_volume\_type](#input\_root\_volume\_type) | Root volume type: gp3, gp2, io1, io2 | `string` | `"gp3"` | no |
 | <a name="input_security_group_ids"></a> [security\_group\_ids](#input\_security\_group\_ids) | Existing security group IDs to attach to instances | `list(string)` | `[]` | no |
 | <a name="input_security_group_source_security_group_ids"></a> [security\_group\_source\_security\_group\_ids](#input\_security\_group\_source\_security\_group\_ids) | List of source security group IDs to allow ingress from (alternative to VPC CIDR). When provided, ingress rules use these SGs instead of the VPC CIDR block. | `list(string)` | `[]` | no |
-| <a name="input_set_default_strategy"></a> [set\_default\_strategy](#input\_set\_default\_strategy) | Set this capacity provider as the cluster's default strategy | `bool` | `false` | no |
 | <a name="input_spot_allocation_strategy"></a> [spot\_allocation\_strategy](#input\_spot\_allocation\_strategy) | Spot allocation strategy: capacity-optimized, lowest-price, price-capacity-optimized, capacity-optimized-prioritized | `string` | `"price-capacity-optimized"` | no |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | List of subnet IDs for ASG instance placement | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources | `map(string)` | `{}` | no |
