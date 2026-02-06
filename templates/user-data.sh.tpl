@@ -64,6 +64,14 @@ cat >> /etc/security/limits.conf <<'EOFLIMITS'
 *               hard    nofile          65536
 EOFLIMITS
 
-# Enable and start ECS agent (should be automatic, but ensure it)
+# ==============================================================================
+# Pull ECS Agent Container Image (AL2023 requirement)
+# ==============================================================================
+
+# On AL2023, ECS agent runs as a container and must be pulled first
+echo "Pulling ECS agent container image..."
+docker pull public.ecr.aws/ecs/amazon-ecs-agent:latest
+
+# Enable and start ECS agent
 systemctl enable ecs
 systemctl start ecs
