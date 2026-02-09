@@ -259,11 +259,12 @@ No modules.
 | <a name="input_ecs_reserved_memory"></a> [ecs\_reserved\_memory](#input\_ecs\_reserved\_memory) | Memory reserved for ECS agent and system processes (MiB) | `number` | `256` | no |
 | <a name="input_enable_imdsv2"></a> [enable\_imdsv2](#input\_enable\_imdsv2) | Require IMDSv2 for instance metadata (recommended) | `bool` | `true` | no |
 | <a name="input_enable_ssm"></a> [enable\_ssm](#input\_enable\_ssm) | Attach SSM policy for Session Manager access | `bool` | `true` | no |
+| <a name="input_enabled_metrics"></a> [enabled\_metrics](#input\_enabled\_metrics) | Enable ASG CloudWatch metrics collection | `bool` | `true` | no |
 | <a name="input_gpu_enabled"></a> [gpu\_enabled](#input\_gpu\_enabled) | Enable GPU support (uses GPU AMI and configures NVIDIA runtime) | `bool` | `false` | no |
 | <a name="input_health_check_grace_period"></a> [health\_check\_grace\_period](#input\_health\_check\_grace\_period) | Seconds before health checks start after instance launch | `number` | `300` | no |
 | <a name="input_health_check_type"></a> [health\_check\_type](#input\_health\_check\_type) | Health check type: EC2 or ELB (use ELB when instances are behind a load balancer) | `string` | `"EC2"` | no |
 | <a name="input_instance_profile_arn"></a> [instance\_profile\_arn](#input\_instance\_profile\_arn) | Existing IAM instance profile ARN (required if create\_iam\_role = false). Note: this must be an instance profile ARN, not a role ARN. | `string` | `null` | no |
-| <a name="input_instance_refresh_enabled"></a> [instance\_refresh\_enabled](#input\_instance\_refresh\_enabled) | Enable automatic instance refresh on launch template changes | `bool` | `false` | no |
+| <a name="input_instance_refresh_enabled"></a> [instance\_refresh\_enabled](#input\_instance\_refresh\_enabled) | Enable automatic instance refresh on launch template changes | `bool` | `true` | no |
 | <a name="input_instance_refresh_min_healthy"></a> [instance\_refresh\_min\_healthy](#input\_instance\_refresh\_min\_healthy) | Minimum healthy percentage during instance refresh | `number` | `50` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | EC2 instance type (used when instance\_types is empty) | `string` | `"t3.medium"` | no |
 | <a name="input_instance_types"></a> [instance\_types](#input\_instance\_types) | List of instance types for mixed instances policy (Spot). If empty, uses instance\_type | `list(string)` | `[]` | no |
@@ -291,7 +292,7 @@ No modules.
 | <a name="input_spot_allocation_strategy"></a> [spot\_allocation\_strategy](#input\_spot\_allocation\_strategy) | Spot allocation strategy: capacity-optimized, lowest-price, price-capacity-optimized, capacity-optimized-prioritized | `string` | `"price-capacity-optimized"` | no |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | List of subnet IDs for ASG instance placement | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources | `map(string)` | `{}` | no |
-| <a name="input_target_capacity"></a> [target\_capacity](#input\_target\_capacity) | Target capacity utilization percentage (1-100) | `number` | `100` | no |
+| <a name="input_target_capacity"></a> [target\_capacity](#input\_target\_capacity) | Target capacity utilization percentage (1-100). Use 100 for reactive scaling (no headroom buffer). Lower values (e.g. 80) pre-provision extra instances for faster task placement. | `number` | `100` | no |
 | <a name="input_use_spot"></a> [use\_spot](#input\_use\_spot) | Use Spot instances via mixed instances policy | `bool` | `false` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID for security group creation | `string` | n/a | yes |
 
