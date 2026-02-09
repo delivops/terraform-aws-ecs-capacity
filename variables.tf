@@ -148,13 +148,19 @@ variable "max_instance_lifetime" {
 variable "instance_refresh_enabled" {
   description = "Enable automatic instance refresh on launch template changes"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "instance_refresh_min_healthy" {
   description = "Minimum healthy percentage during instance refresh"
   type        = number
   default     = 50
+}
+
+variable "enabled_metrics" {
+  description = "Enable ASG CloudWatch metrics collection"
+  type        = bool
+  default     = true
 }
 
 # ==============================================================================
@@ -214,7 +220,7 @@ variable "managed_scaling_enabled" {
 }
 
 variable "target_capacity" {
-  description = "Target capacity utilization percentage (1-100)"
+  description = "Target capacity utilization percentage (1-100). Use 100 for reactive scaling (no headroom buffer). Lower values (e.g. 80) pre-provision extra instances for faster task placement."
   type        = number
   default     = 100
 

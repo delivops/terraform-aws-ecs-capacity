@@ -25,13 +25,30 @@ resource "aws_autoscaling_group" "ecs" {
   default_instance_warmup   = var.instance_warmup_period
   capacity_rebalance        = var.use_spot # Enable for Spot instances
 
+  # ASG CloudWatch metrics
+  enabled_metrics = var.enabled_metrics ? [
+    "GroupMinSize",
+    "GroupMaxSize",
+    "GroupDesiredCapacity",
+    "GroupInServiceInstances",
+    "GroupPendingInstances",
+    "GroupStandbyInstances",
+    "GroupTerminatingInstances",
+    "GroupTotalInstances",
+    "GroupInServiceCapacity",
+    "GroupPendingCapacity",
+    "GroupTerminatingCapacity",
+    "GroupStandbyCapacity",
+    "GroupTotalCapacity",
+  ] : []
+
   # Use launch template directly for On-Demand only
   dynamic "launch_template" {
     for_each = local.use_mixed_instances ? [] : [1]
 
     content {
       id      = aws_launch_template.ecs.id
-      version = "$Latest"
+      version = aws_launch_template.ecs.latest_version
     }
   }
 
@@ -49,7 +66,7 @@ resource "aws_autoscaling_group" "ecs" {
       launch_template {
         launch_template_specification {
           launch_template_id = aws_launch_template.ecs.id
-          version            = "$Latest"
+          version            = aws_launch_template.ecs.latest_version
         }
 
         # Override instance types
@@ -74,14 +91,12 @@ resource "aws_autoscaling_group" "ecs" {
 
       preferences {
         min_healthy_percentage       = var.instance_refresh_min_healthy
-        max_healthy_percentage       = 200
+        max_healthy_percentage       = var.instance_refresh_min_healthy + 100
         instance_warmup              = var.instance_warmup_period
-        skip_matching                = true
+        skip_matching                = false
         auto_rollback                = true
-        scale_in_protected_instances = "Ignore"
+        scale_in_protected_instances = "Refresh"
       }
-
-      triggers = ["tag"]
     }
   }
 
