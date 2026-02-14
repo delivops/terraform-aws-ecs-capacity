@@ -3,7 +3,7 @@
 # ==============================================================================
 
 locals {
-  iam_role_name = "${var.cluster_name}-ecs-instance-${random_id.suffix.hex}"
+  iam_role_name = "${var.cluster_name}-ecs-instance-${local.resource_suffix}"
 }
 
 # Trust policy for EC2 to assume the role

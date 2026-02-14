@@ -3,7 +3,7 @@
 # ==============================================================================
 
 locals {
-  capacity_provider_name = var.capacity_provider_name != null ? var.capacity_provider_name : "${var.cluster_name}-ec2-${random_id.suffix.hex}"
+  capacity_provider_name = var.capacity_provider_name != null ? var.capacity_provider_name : "${var.cluster_name}-ec2-${local.resource_suffix}"
 }
 
 resource "aws_ecs_capacity_provider" "this" {

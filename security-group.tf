@@ -3,7 +3,7 @@
 # ==============================================================================
 
 locals {
-  security_group_name = "${var.cluster_name}-ecs-instances-${random_id.suffix.hex}"
+  security_group_name = "${var.cluster_name}-ecs-instances-${local.resource_suffix}"
 
   # Combine provided security groups with created one
   all_security_group_ids = var.create_security_group ? concat(

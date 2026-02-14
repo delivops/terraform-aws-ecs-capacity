@@ -25,6 +25,9 @@ module "ecs_capacity_spot" {
   vpc_id       = var.vpc_id
   subnet_ids   = var.private_subnet_ids
 
+  # Human-readable identifier for ASG and related resources
+  resource_identifier = "spot-mixed"
+
   # Enable Spot instances
   use_spot = true
 
@@ -72,6 +75,9 @@ module "ecs_capacity_ondemand" {
   cluster_name = aws_ecs_cluster.main.name
   vpc_id       = var.vpc_id
   subnet_ids   = var.private_subnet_ids
+
+  # Human-readable identifier for ASG and related resources
+  resource_identifier = "ondemand"
 
   # On-Demand only (default)
   instance_type    = "t3.large"

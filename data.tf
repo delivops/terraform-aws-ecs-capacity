@@ -7,6 +7,11 @@ resource "random_id" "suffix" {
   byte_length = 4
 }
 
+# Global resource suffix for consistent naming across all resources
+locals {
+  resource_suffix = var.resource_identifier != null ? var.resource_identifier : random_id.suffix.hex
+}
+
 # Fetch the VPC for CIDR block (used in security group)
 data "aws_vpc" "this" {
   id = var.vpc_id
