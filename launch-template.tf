@@ -3,7 +3,7 @@
 # ==============================================================================
 
 locals {
-  launch_template_name = "${var.cluster_name}-ecs-${random_id.suffix.hex}"
+  launch_template_name = "${var.cluster_name}-ecs-${local.resource_suffix}"
 
   # Prepare container instance tags as JSON
   container_instance_tags_json = length(var.ecs_container_instance_tags) > 0 ? jsonencode(var.ecs_container_instance_tags) : "{}"

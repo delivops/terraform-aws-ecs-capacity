@@ -207,6 +207,17 @@ variable "capacity_provider_name" {
   default     = null
 }
 
+variable "resource_identifier" {
+  description = "Human-readable identifier to replace random suffix in resource names (e.g., 'spot', 'ondemand', 'gpu'). If not provided, uses random hex suffix for uniqueness"
+  type        = string
+  default     = null
+
+  validation {
+    condition     = var.resource_identifier == null || can(regex("^[a-z0-9][a-z0-9-]*[a-z0-9]$", var.resource_identifier))
+    error_message = "resource_identifier must contain only lowercase letters, numbers, and hyphens, and cannot start or end with a hyphen"
+  }
+}
+
 variable "managed_scaling_enabled" {
   description = "Enable ECS managed scaling"
   type        = bool

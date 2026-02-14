@@ -282,6 +282,7 @@ No modules.
 | <a name="input_minimum_scaling_step_size"></a> [minimum\_scaling\_step\_size](#input\_minimum\_scaling\_step\_size) | Minimum number of instances to scale at once | `number` | `1` | no |
 | <a name="input_on_demand_base_capacity"></a> [on\_demand\_base\_capacity](#input\_on\_demand\_base\_capacity) | Minimum number of On-Demand instances before using Spot | `number` | `0` | no |
 | <a name="input_on_demand_percentage"></a> [on\_demand\_percentage](#input\_on\_demand\_percentage) | Percentage of On-Demand instances above base capacity (0-100) | `number` | `0` | no |
+| <a name="input_resource_identifier"></a> [resource\_identifier](#input\_resource\_identifier) | Human-readable identifier to replace random suffix in resource names (e.g., 'spot', 'ondemand', 'gpu'). If not provided, uses random hex suffix for uniqueness | `string` | `null` | no |
 | <a name="input_root_volume_encrypted"></a> [root\_volume\_encrypted](#input\_root\_volume\_encrypted) | Enable EBS encryption | `bool` | `true` | no |
 | <a name="input_root_volume_iops"></a> [root\_volume\_iops](#input\_root\_volume\_iops) | IOPS for gp3/io1/io2 volumes | `number` | `3000` | no |
 | <a name="input_root_volume_kms_key_id"></a> [root\_volume\_kms\_key\_id](#input\_root\_volume\_kms\_key\_id) | KMS key ID for EBS encryption (null = AWS managed key) | `string` | `null` | no |

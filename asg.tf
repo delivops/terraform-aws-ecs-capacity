@@ -3,7 +3,8 @@
 # ==============================================================================
 
 locals {
-  asg_name = "${var.cluster_name}-ecs-${random_id.suffix.hex}"
+  # Build ASG name using the global resource suffix
+  asg_name = "${var.cluster_name}-ecs-${local.resource_suffix}"
 
   # Determine if we should use mixed instances policy (for Spot)
   use_mixed_instances = var.use_spot || length(var.instance_types) > 0
