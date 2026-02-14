@@ -273,7 +273,7 @@ No modules.
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | SSH key pair name (optional, prefer SSM Session Manager) | `string` | `null` | no |
 | <a name="input_managed_draining"></a> [managed\_draining](#input\_managed\_draining) | Enable graceful task draining on scale-in | `bool` | `true` | no |
 | <a name="input_managed_scaling_enabled"></a> [managed\_scaling\_enabled](#input\_managed\_scaling\_enabled) | Enable ECS managed scaling | `bool` | `true` | no |
-| <a name="input_managed_termination_protection"></a> [managed\_termination\_protection](#input\_managed\_termination\_protection) | Enable ECS-managed scale-in protection. Usually unnecessary when managed\_draining is enabled. | `bool` | `false` | no |
+| <a name="input_managed_termination_protection"></a> [managed\_termination\_protection](#input\_managed\_termination\_protection) | Enable ECS-managed scale-in protection. When true, ECS sets protect\_from\_scale\_in on instances with running tasks. Requires managed\_scaling\_enabled. Usually unnecessary when managed\_draining is enabled. | `bool` | `false` | no |
 | <a name="input_max_instance_lifetime"></a> [max\_instance\_lifetime](#input\_max\_instance\_lifetime) | Maximum instance lifetime in seconds (0 = disabled, min 86400) | `number` | `0` | no |
 | <a name="input_max_size"></a> [max\_size](#input\_max\_size) | Maximum number of instances in the ASG | `number` | `10` | no |
 | <a name="input_maximum_scaling_step_size"></a> [maximum\_scaling\_step\_size](#input\_maximum\_scaling\_step\_size) | Maximum number of instances to scale in a single scaling action | `number` | `1` | no |
