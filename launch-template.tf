@@ -17,6 +17,7 @@ locals {
     ecs_log_level                 = var.ecs_log_level
     ecs_container_instance_tags   = local.container_instance_tags_json
     gpu_enabled                   = var.gpu_enabled
+    additional_user_data          = var.additional_user_data
   }))
 }
 

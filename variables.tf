@@ -293,6 +293,12 @@ variable "ecs_enable_container_metadata" {
   default     = true
 }
 
+variable "additional_user_data" {
+  description = "Additional user data script/commands to append after ECS and GPU configuration"
+  type        = string
+  default     = ""
+}
+
 # ==============================================================================
 # GPU CONFIGURATION
 # ==============================================================================

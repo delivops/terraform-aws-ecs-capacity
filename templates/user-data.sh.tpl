@@ -51,6 +51,13 @@ EOF
 systemctl restart docker
 %{ endif ~}
 
+%{ if additional_user_data != "" ~}
+# ==============================================================================
+# Custom Additional User Data
+# ==============================================================================
+${additional_user_data}
+%{ endif ~}
+
 echo "ECS instance configuration completed at $(date)"
 
 
