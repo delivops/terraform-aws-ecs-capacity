@@ -246,6 +246,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_additional_iam_policies"></a> [additional\_iam\_policies](#input\_additional\_iam\_policies) | Additional IAM policy ARNs to attach to the instance role | `list(string)` | `[]` | no |
+| <a name="input_additional_user_data"></a> [additional\_user\_data](#input\_additional\_user\_data) | Additional user data script/commands to append after ECS and GPU configuration | `string` | `""` | no |
 | <a name="input_ami_id"></a> [ami\_id](#input\_ami\_id) | Custom AMI ID (overrides SSM lookup if provided) | `string` | `null` | no |
 | <a name="input_ami_type"></a> [ami\_type](#input\_ami\_type) | AMI type for SSM lookup: standard, gpu (AL2023), gpu-al2 (legacy AL2), arm64, inferentia | `string` | `"standard"` | no |
 | <a name="input_capacity_provider_name"></a> [capacity\_provider\_name](#input\_capacity\_provider\_name) | Custom capacity provider name (defaults to {cluster\_name}-{suffix}) | `string` | `null` | no |
