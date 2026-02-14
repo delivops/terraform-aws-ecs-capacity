@@ -100,6 +100,12 @@ module "ecs_capacity" {
     Environment = var.environment
   }
 
+  # Custom user data (optional)
+  # additional_user_data = <<-EOF
+  #   yum install -y amazon-cloudwatch-agent
+  #   /opt/aws/amazon-cloudwatch-agent/bin/amazon-cloudwatch-agent-ctl -a start
+  # EOF
+
   # Security
   enable_ssm    = true
   enable_imdsv2 = true

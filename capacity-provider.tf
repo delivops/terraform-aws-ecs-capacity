@@ -32,6 +32,13 @@ resource "aws_ecs_capacity_provider" "this" {
     "ecs:cluster" = var.cluster_name
   })
 
+  lifecycle {
+    precondition {
+      condition     = !(var.managed_termination_protection && !var.managed_scaling_enabled)
+      error_message = "managed_termination_protection requires managed_scaling_enabled = true. Without managed scaling, ECS cannot manage per-instance scale-in protection, causing all instances to remain protected."
+    }
+  }
+
   depends_on = [
     aws_autoscaling_group.ecs,
   ]
