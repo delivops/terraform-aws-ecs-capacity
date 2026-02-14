@@ -20,7 +20,7 @@ resource "aws_autoscaling_group" "ecs" {
   desired_capacity          = var.desired_capacity
   health_check_type         = var.health_check_type
   health_check_grace_period = var.health_check_grace_period
-  protect_from_scale_in     = var.protect_from_scale_in
+  protect_from_scale_in     = var.managed_termination_protection
   max_instance_lifetime     = var.max_instance_lifetime > 0 ? var.max_instance_lifetime : null
   default_instance_warmup   = var.instance_warmup_period
   capacity_rebalance        = var.use_spot # Enable for Spot instances

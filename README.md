@@ -191,7 +191,8 @@ resource "aws_ecs_cluster_capacity_providers" "this" {
 ## Notes
 
 - Default AMI type is AL2023 ECS-optimized
-- Managed termination protection requires `protect_from_scale_in = true`
+- Scale-in protection is automatically derived from `managed_termination_protection` to prevent misconfiguration
+- `managed_termination_protection` requires `managed_scaling_enabled = true`
 - GPU instances auto-configure NVIDIA runtime via user data
 - Use `capacity_provider_strategy` in ECS service to target EC2 capacity
 
@@ -272,15 +273,14 @@ No modules.
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | SSH key pair name (optional, prefer SSM Session Manager) | `string` | `null` | no |
 | <a name="input_managed_draining"></a> [managed\_draining](#input\_managed\_draining) | Enable graceful task draining on scale-in | `bool` | `true` | no |
 | <a name="input_managed_scaling_enabled"></a> [managed\_scaling\_enabled](#input\_managed\_scaling\_enabled) | Enable ECS managed scaling | `bool` | `true` | no |
-| <a name="input_managed_termination_protection"></a> [managed\_termination\_protection](#input\_managed\_termination\_protection) | Prevent termination of instances with running tasks | `bool` | `true` | no |
+| <a name="input_managed_termination_protection"></a> [managed\_termination\_protection](#input\_managed\_termination\_protection) | Enable ECS-managed scale-in protection. Usually unnecessary when managed\_draining is enabled. | `bool` | `false` | no |
 | <a name="input_max_instance_lifetime"></a> [max\_instance\_lifetime](#input\_max\_instance\_lifetime) | Maximum instance lifetime in seconds (0 = disabled, min 86400) | `number` | `0` | no |
 | <a name="input_max_size"></a> [max\_size](#input\_max\_size) | Maximum number of instances in the ASG | `number` | `10` | no |
-| <a name="input_maximum_scaling_step_size"></a> [maximum\_scaling\_step\_size](#input\_maximum\_scaling\_step\_size) | Maximum number of instances to scale at once | `number` | `10` | no |
+| <a name="input_maximum_scaling_step_size"></a> [maximum\_scaling\_step\_size](#input\_maximum\_scaling\_step\_size) | Maximum number of instances to scale in a single scaling action | `number` | `1` | no |
 | <a name="input_min_size"></a> [min\_size](#input\_min\_size) | Minimum number of instances in the ASG | `number` | `0` | no |
 | <a name="input_minimum_scaling_step_size"></a> [minimum\_scaling\_step\_size](#input\_minimum\_scaling\_step\_size) | Minimum number of instances to scale at once | `number` | `1` | no |
 | <a name="input_on_demand_base_capacity"></a> [on\_demand\_base\_capacity](#input\_on\_demand\_base\_capacity) | Minimum number of On-Demand instances before using Spot | `number` | `0` | no |
 | <a name="input_on_demand_percentage"></a> [on\_demand\_percentage](#input\_on\_demand\_percentage) | Percentage of On-Demand instances above base capacity (0-100) | `number` | `0` | no |
-| <a name="input_protect_from_scale_in"></a> [protect\_from\_scale\_in](#input\_protect\_from\_scale\_in) | Enable scale-in protection for managed termination | `bool` | `true` | no |
 | <a name="input_root_volume_encrypted"></a> [root\_volume\_encrypted](#input\_root\_volume\_encrypted) | Enable EBS encryption | `bool` | `true` | no |
 | <a name="input_root_volume_iops"></a> [root\_volume\_iops](#input\_root\_volume\_iops) | IOPS for gp3/io1/io2 volumes | `number` | `3000` | no |
 | <a name="input_root_volume_kms_key_id"></a> [root\_volume\_kms\_key\_id](#input\_root\_volume\_kms\_key\_id) | KMS key ID for EBS encryption (null = AWS managed key) | `string` | `null` | no |

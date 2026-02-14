@@ -133,12 +133,6 @@ variable "health_check_type" {
   }
 }
 
-variable "protect_from_scale_in" {
-  description = "Enable scale-in protection for managed termination"
-  type        = bool
-  default     = true
-}
-
 variable "max_instance_lifetime" {
   description = "Maximum instance lifetime in seconds (0 = disabled, min 86400)"
   type        = number
@@ -237,9 +231,9 @@ variable "minimum_scaling_step_size" {
 }
 
 variable "maximum_scaling_step_size" {
-  description = "Maximum number of instances to scale at once"
+  description = "Maximum number of instances to scale in a single scaling action"
   type        = number
-  default     = 10
+  default     = 1
 }
 
 variable "instance_warmup_period" {
@@ -249,9 +243,9 @@ variable "instance_warmup_period" {
 }
 
 variable "managed_termination_protection" {
-  description = "Prevent termination of instances with running tasks"
+  description = "Enable ECS-managed scale-in protection. When true, ECS sets protect_from_scale_in on instances with running tasks. Requires managed_scaling_enabled. Usually unnecessary when managed_draining is enabled."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "managed_draining" {
