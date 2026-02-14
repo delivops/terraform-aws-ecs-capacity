@@ -191,7 +191,8 @@ resource "aws_ecs_cluster_capacity_providers" "this" {
 ## Notes
 
 - Default AMI type is AL2023 ECS-optimized
-- Managed termination protection requires `protect_from_scale_in = true`
+- Scale-in protection is automatically derived from `managed_termination_protection` to prevent misconfiguration
+- `managed_termination_protection` requires `managed_scaling_enabled = true`
 - GPU instances auto-configure NVIDIA runtime via user data
 - Use `capacity_provider_strategy` in ECS service to target EC2 capacity
 
@@ -245,6 +246,7 @@ No modules.
 | Name | Description | Type | Default | Required |
 |------|-------------|------|---------|:--------:|
 | <a name="input_additional_iam_policies"></a> [additional\_iam\_policies](#input\_additional\_iam\_policies) | Additional IAM policy ARNs to attach to the instance role | `list(string)` | `[]` | no |
+| <a name="input_additional_user_data"></a> [additional\_user\_data](#input\_additional\_user\_data) | Additional user data script/commands to append after ECS and GPU configuration | `string` | `""` | no |
 | <a name="input_ami_id"></a> [ami\_id](#input\_ami\_id) | Custom AMI ID (overrides SSM lookup if provided) | `string` | `null` | no |
 | <a name="input_ami_type"></a> [ami\_type](#input\_ami\_type) | AMI type for SSM lookup: standard, gpu (AL2023), gpu-al2 (legacy AL2), arm64, inferentia | `string` | `"standard"` | no |
 | <a name="input_capacity_provider_name"></a> [capacity\_provider\_name](#input\_capacity\_provider\_name) | Custom capacity provider name (defaults to {cluster\_name}-{suffix}) | `string` | `null` | no |
@@ -259,11 +261,12 @@ No modules.
 | <a name="input_ecs_reserved_memory"></a> [ecs\_reserved\_memory](#input\_ecs\_reserved\_memory) | Memory reserved for ECS agent and system processes (MiB) | `number` | `256` | no |
 | <a name="input_enable_imdsv2"></a> [enable\_imdsv2](#input\_enable\_imdsv2) | Require IMDSv2 for instance metadata (recommended) | `bool` | `true` | no |
 | <a name="input_enable_ssm"></a> [enable\_ssm](#input\_enable\_ssm) | Attach SSM policy for Session Manager access | `bool` | `true` | no |
+| <a name="input_enabled_metrics"></a> [enabled\_metrics](#input\_enabled\_metrics) | Enable ASG CloudWatch metrics collection | `bool` | `true` | no |
 | <a name="input_gpu_enabled"></a> [gpu\_enabled](#input\_gpu\_enabled) | Enable GPU support (uses GPU AMI and configures NVIDIA runtime) | `bool` | `false` | no |
 | <a name="input_health_check_grace_period"></a> [health\_check\_grace\_period](#input\_health\_check\_grace\_period) | Seconds before health checks start after instance launch | `number` | `300` | no |
 | <a name="input_health_check_type"></a> [health\_check\_type](#input\_health\_check\_type) | Health check type: EC2 or ELB (use ELB when instances are behind a load balancer) | `string` | `"EC2"` | no |
 | <a name="input_instance_profile_arn"></a> [instance\_profile\_arn](#input\_instance\_profile\_arn) | Existing IAM instance profile ARN (required if create\_iam\_role = false). Note: this must be an instance profile ARN, not a role ARN. | `string` | `null` | no |
-| <a name="input_instance_refresh_enabled"></a> [instance\_refresh\_enabled](#input\_instance\_refresh\_enabled) | Enable automatic instance refresh on launch template changes | `bool` | `false` | no |
+| <a name="input_instance_refresh_enabled"></a> [instance\_refresh\_enabled](#input\_instance\_refresh\_enabled) | Enable automatic instance refresh on launch template changes | `bool` | `true` | no |
 | <a name="input_instance_refresh_min_healthy"></a> [instance\_refresh\_min\_healthy](#input\_instance\_refresh\_min\_healthy) | Minimum healthy percentage during instance refresh | `number` | `50` | no |
 | <a name="input_instance_type"></a> [instance\_type](#input\_instance\_type) | EC2 instance type (used when instance\_types is empty) | `string` | `"t3.medium"` | no |
 | <a name="input_instance_types"></a> [instance\_types](#input\_instance\_types) | List of instance types for mixed instances policy (Spot). If empty, uses instance\_type | `list(string)` | `[]` | no |
@@ -271,15 +274,14 @@ No modules.
 | <a name="input_key_name"></a> [key\_name](#input\_key\_name) | SSH key pair name (optional, prefer SSM Session Manager) | `string` | `null` | no |
 | <a name="input_managed_draining"></a> [managed\_draining](#input\_managed\_draining) | Enable graceful task draining on scale-in | `bool` | `true` | no |
 | <a name="input_managed_scaling_enabled"></a> [managed\_scaling\_enabled](#input\_managed\_scaling\_enabled) | Enable ECS managed scaling | `bool` | `true` | no |
-| <a name="input_managed_termination_protection"></a> [managed\_termination\_protection](#input\_managed\_termination\_protection) | Prevent termination of instances with running tasks | `bool` | `true` | no |
+| <a name="input_managed_termination_protection"></a> [managed\_termination\_protection](#input\_managed\_termination\_protection) | Enable ECS-managed scale-in protection. When true, ECS sets protect\_from\_scale\_in on instances with running tasks. Requires managed\_scaling\_enabled. Usually unnecessary when managed\_draining is enabled. | `bool` | `false` | no |
 | <a name="input_max_instance_lifetime"></a> [max\_instance\_lifetime](#input\_max\_instance\_lifetime) | Maximum instance lifetime in seconds (0 = disabled, min 86400) | `number` | `0` | no |
 | <a name="input_max_size"></a> [max\_size](#input\_max\_size) | Maximum number of instances in the ASG | `number` | `10` | no |
-| <a name="input_maximum_scaling_step_size"></a> [maximum\_scaling\_step\_size](#input\_maximum\_scaling\_step\_size) | Maximum number of instances to scale at once | `number` | `10` | no |
+| <a name="input_maximum_scaling_step_size"></a> [maximum\_scaling\_step\_size](#input\_maximum\_scaling\_step\_size) | Maximum number of instances to scale in a single scaling action. Default is 1 for safer, gradual scale-up to reduce the risk of over-provisioning. Note: this is lower than the AWS ECS default of 10 and can significantly slow down response to sudden traffic spikes, especially with the 300s instance\_warmup\_period. For bursty or latency-sensitive workloads that need faster scale-out (e.g. scaling from 0 to many instances quickly), consider overriding this to a higher value such as 5–10, balancing faster scale-up against potential temporary over-capacity. | `number` | `1` | no |
 | <a name="input_min_size"></a> [min\_size](#input\_min\_size) | Minimum number of instances in the ASG | `number` | `0` | no |
 | <a name="input_minimum_scaling_step_size"></a> [minimum\_scaling\_step\_size](#input\_minimum\_scaling\_step\_size) | Minimum number of instances to scale at once | `number` | `1` | no |
 | <a name="input_on_demand_base_capacity"></a> [on\_demand\_base\_capacity](#input\_on\_demand\_base\_capacity) | Minimum number of On-Demand instances before using Spot | `number` | `0` | no |
 | <a name="input_on_demand_percentage"></a> [on\_demand\_percentage](#input\_on\_demand\_percentage) | Percentage of On-Demand instances above base capacity (0-100) | `number` | `0` | no |
-| <a name="input_protect_from_scale_in"></a> [protect\_from\_scale\_in](#input\_protect\_from\_scale\_in) | Enable scale-in protection for managed termination | `bool` | `true` | no |
 | <a name="input_root_volume_encrypted"></a> [root\_volume\_encrypted](#input\_root\_volume\_encrypted) | Enable EBS encryption | `bool` | `true` | no |
 | <a name="input_root_volume_iops"></a> [root\_volume\_iops](#input\_root\_volume\_iops) | IOPS for gp3/io1/io2 volumes | `number` | `3000` | no |
 | <a name="input_root_volume_kms_key_id"></a> [root\_volume\_kms\_key\_id](#input\_root\_volume\_kms\_key\_id) | KMS key ID for EBS encryption (null = AWS managed key) | `string` | `null` | no |
@@ -291,7 +293,7 @@ No modules.
 | <a name="input_spot_allocation_strategy"></a> [spot\_allocation\_strategy](#input\_spot\_allocation\_strategy) | Spot allocation strategy: capacity-optimized, lowest-price, price-capacity-optimized, capacity-optimized-prioritized | `string` | `"price-capacity-optimized"` | no |
 | <a name="input_subnet_ids"></a> [subnet\_ids](#input\_subnet\_ids) | List of subnet IDs for ASG instance placement | `list(string)` | n/a | yes |
 | <a name="input_tags"></a> [tags](#input\_tags) | Tags to apply to all resources | `map(string)` | `{}` | no |
-| <a name="input_target_capacity"></a> [target\_capacity](#input\_target\_capacity) | Target capacity utilization percentage (1-100) | `number` | `100` | no |
+| <a name="input_target_capacity"></a> [target\_capacity](#input\_target\_capacity) | Target capacity utilization percentage (1-100). Use 100 for reactive scaling (no headroom buffer). Lower values (e.g. 80) pre-provision extra instances for faster task placement. | `number` | `100` | no |
 | <a name="input_use_spot"></a> [use\_spot](#input\_use\_spot) | Use Spot instances via mixed instances policy | `bool` | `false` | no |
 | <a name="input_vpc_id"></a> [vpc\_id](#input\_vpc\_id) | VPC ID for security group creation | `string` | n/a | yes |
 

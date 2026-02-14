@@ -133,12 +133,6 @@ variable "health_check_type" {
   }
 }
 
-variable "protect_from_scale_in" {
-  description = "Enable scale-in protection for managed termination"
-  type        = bool
-  default     = true
-}
-
 variable "max_instance_lifetime" {
   description = "Maximum instance lifetime in seconds (0 = disabled, min 86400)"
   type        = number
@@ -148,13 +142,19 @@ variable "max_instance_lifetime" {
 variable "instance_refresh_enabled" {
   description = "Enable automatic instance refresh on launch template changes"
   type        = bool
-  default     = false
+  default     = true
 }
 
 variable "instance_refresh_min_healthy" {
   description = "Minimum healthy percentage during instance refresh"
   type        = number
   default     = 50
+}
+
+variable "enabled_metrics" {
+  description = "Enable ASG CloudWatch metrics collection"
+  type        = bool
+  default     = true
 }
 
 # ==============================================================================
@@ -214,7 +214,7 @@ variable "managed_scaling_enabled" {
 }
 
 variable "target_capacity" {
-  description = "Target capacity utilization percentage (1-100)"
+  description = "Target capacity utilization percentage (1-100). Use 100 for reactive scaling (no headroom buffer). Lower values (e.g. 80) pre-provision extra instances for faster task placement."
   type        = number
   default     = 100
 
@@ -231,9 +231,9 @@ variable "minimum_scaling_step_size" {
 }
 
 variable "maximum_scaling_step_size" {
-  description = "Maximum number of instances to scale at once"
+  description = "Maximum number of instances to scale in a single scaling action. Default is 1 for safer, gradual scale-up to reduce the risk of over-provisioning. Note: this is lower than the AWS ECS default of 10 and can significantly slow down response to sudden traffic spikes, especially with the 300s instance_warmup_period. For bursty or latency-sensitive workloads that need faster scale-out (e.g. scaling from 0 to many instances quickly), consider overriding this to a higher value such as 5–10, balancing faster scale-up against potential temporary over-capacity."
   type        = number
-  default     = 10
+  default     = 1
 }
 
 variable "instance_warmup_period" {
@@ -243,9 +243,9 @@ variable "instance_warmup_period" {
 }
 
 variable "managed_termination_protection" {
-  description = "Prevent termination of instances with running tasks"
+  description = "Enable ECS-managed scale-in protection. When true, ECS sets protect_from_scale_in on instances with running tasks. Requires managed_scaling_enabled. Usually unnecessary when managed_draining is enabled."
   type        = bool
-  default     = true
+  default     = false
 }
 
 variable "managed_draining" {
@@ -291,6 +291,12 @@ variable "ecs_enable_container_metadata" {
   description = "Enable container metadata file for tasks"
   type        = bool
   default     = true
+}
+
+variable "additional_user_data" {
+  description = "Additional user data script/commands to append after ECS and GPU configuration"
+  type        = string
+  default     = ""
 }
 
 # ==============================================================================

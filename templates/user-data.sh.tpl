@@ -4,12 +4,16 @@ set -euo pipefail
 # ==============================================================================
 # ECS EC2 Instance User Data Script
 # ==============================================================================
+# The AL2023 ECS-optimized AMI ships with ecs-init as a systemd service that
+# handles agent pulling, caching, and startup automatically. User-data runs
+# before ecs.service (cloud-final.service -> ecs.service ordering), so we only
+# need to populate /etc/ecs/ecs.config here.
+# ==============================================================================
 
-# Enable logging
 exec > >(tee /var/log/user-data.log) 2>&1
 echo "Starting ECS instance configuration at $(date)"
 
-# Configure ECS Agent
+# Configure ECS Agent — this is the only required step
 cat <<'EOF' >> /etc/ecs/ecs.config
 ECS_CLUSTER=${cluster_name}
 ECS_RESERVED_MEMORY=${ecs_reserved_memory}
@@ -26,19 +30,12 @@ EOF
 # GPU Configuration
 # ==============================================================================
 
-# Enable GPU support in ECS Agent
-cat <<'EOFGPU' >> /etc/ecs/ecs.config
+# Enable GPU support in ECS config and set NVIDIA as default Docker runtime
+cat <<'EOF' >> /etc/ecs/ecs.config
 ECS_ENABLE_GPU_SUPPORT=true
-EOFGPU
+EOF
 
-# The GPU AMI already has NVIDIA drivers and nvidia-container-runtime installed
-# Ensure Docker is configured to use NVIDIA runtime
-if [ -f /etc/docker/daemon.json ]; then
-  # Backup existing config
-  cp /etc/docker/daemon.json /etc/docker/daemon.json.bak
-fi
-
-cat > /etc/docker/daemon.json <<'EOFDOCKER'
+cat > /etc/docker/daemon.json <<'EOF'
 {
   "default-runtime": "nvidia",
   "runtimes": {
@@ -48,22 +45,21 @@ cat > /etc/docker/daemon.json <<'EOFDOCKER'
     }
   }
 }
-EOFDOCKER
+EOF
 
-# Restart Docker to apply changes
+# Restart Docker before ecs.service starts
 systemctl restart docker
 %{ endif ~}
 
+%{ if additional_user_data != "" ~}
 # ==============================================================================
-# Additional Configuration
+# Custom Additional User Data
 # ==============================================================================
+${additional_user_data}
+%{ endif ~}
 
-# Increase file descriptor limits for containers
-cat >> /etc/security/limits.conf <<'EOFLIMITS'
-*               soft    nofile          65536
-*               hard    nofile          65536
-EOFLIMITS
+echo "ECS instance configuration completed at $(date)"
 
-# Enable and start ECS agent (should be automatic, but ensure it)
-systemctl enable ecs
-systemctl start ecs
+
+
+
