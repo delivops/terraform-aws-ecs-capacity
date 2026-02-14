@@ -231,7 +231,7 @@ variable "minimum_scaling_step_size" {
 }
 
 variable "maximum_scaling_step_size" {
-  description = "Maximum number of instances to scale in a single scaling action"
+  description = "Maximum number of instances to scale in a single scaling action. Default is 1 for safer, gradual scale-up to reduce the risk of over-provisioning. Note: this is lower than the AWS ECS default of 10 and can significantly slow down response to sudden traffic spikes, especially with the 300s instance_warmup_period. For bursty or latency-sensitive workloads that need faster scale-out (e.g. scaling from 0 to many instances quickly), consider overriding this to a higher value such as 5–10, balancing faster scale-up against potential temporary over-capacity."
   type        = number
   default     = 1
 }
